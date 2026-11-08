@@ -20,5 +20,6 @@ Route::middleware('auth:api')->group(function () {
         Route::post('refresh', [AuthController::class, 'refresh']);
     });
 
-    Route::apiResource('bookings', BookingController::class)->only(['index']);
+    // GET /bookings (list) and GET /bookings/{booking} (one booking)
+    Route::apiResource('bookings', BookingController::class)->only(['index', 'show']);
 });
