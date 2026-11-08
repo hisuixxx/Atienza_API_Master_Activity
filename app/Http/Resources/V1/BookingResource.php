@@ -24,7 +24,12 @@ class BookingResource extends JsonResource
                 'name' => $this->name,
                 'itemId' => $this->item_id,
                 'status' => $this->status,
-                'slotTime' => $this->slot_time,
+                // 'slotTime' => $this->slot_time,
+                // Shown on the detail page only: hidden on the list endpoints
+                'slotTime' => $this->when(
+                    ! $request->routeIs(['bookings.index', 'users.bookings.index']),
+                    $this->slot_time
+                ),
                 'createdAt' => $this->created_at,
                 'updatedAt' => $this->updated_at,
             ],
@@ -35,6 +40,10 @@ class BookingResource extends JsonResource
                     'data' => [
                         'type' => 'user',
                         'id' => $this->user_id,
+                    ],
+
+                    'links' => [
+                        'self' => route('authors.show', ['author' => $this->user_id]),
                     ],
                 ],
             ],
