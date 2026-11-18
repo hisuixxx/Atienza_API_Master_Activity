@@ -68,10 +68,13 @@ class BookingController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * DELETE /api/v1/bookings/{booking}
+     * Deletes the booking. A missing booking never reaches this method: Laravel answers 404.
      */
-    public function destroy(string $id)
+    public function destroy(Booking $booking)
     {
-        //
+        $booking->delete();
+
+        return $this->ok('Booking successfully deleted');
     }
 }
