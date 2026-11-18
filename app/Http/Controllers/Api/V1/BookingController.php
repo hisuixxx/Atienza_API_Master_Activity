@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Booking;
 use App\Http\Resources\V1\BookingResource;
+use App\Http\Filters\V1\BookingFilter;
 
 class BookingController extends Controller
 {
@@ -13,15 +14,20 @@ class BookingController extends Controller
      *GET /api/v1/bookings
      * Returns a paginated list (15 per page). Each booking is transformed by BookingResource.
      */
-    public function index()
+    public function index(BookingFilter $filters)
     {
         // ?include=user: eager load the user in one extra query
-        if ($this->include('user')) {
-            return BookingResource::collection(Booking::with('user')->paginate());
-        }
+        // if ($this->include('user')) {
+        //     return BookingResource::collection(Booking::with('user')->paginate());
+        // }
 
         // return Booking::all();
-        return BookingResource::collection(Booking::paginate());
+        // return BookingResource::collection(Booking::paginate());
+
+        // Apply the filters from the URL (?status=confirmed, ?name=*test*, ?include=user ...)
+        return BookingResource::collection(
+            Booking::filter($filters)->paginate()
+        );
     }
 
     /**
@@ -43,7 +49,7 @@ class BookingController extends Controller
         if ($this->include('user')) {
             return new BookingResource($booking->load('user'));
         }
-        
+
         return new BookingResource($booking);
     }
 

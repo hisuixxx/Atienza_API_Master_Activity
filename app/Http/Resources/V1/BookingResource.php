@@ -47,7 +47,9 @@ class BookingResource extends JsonResource
                     ],
                 ],
             ],
-            
+            // The author object, present only when requested with ?include=products
+            'includes' => UserResource($this->whenLoaded('author')),
+           
             // Link to this booking
             'links' => [
                 'self' => route('bookings.show', ['booking' => $this->id]),

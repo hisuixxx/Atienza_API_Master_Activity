@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Http\Filters\V1\QueryFilter;
+use Illuminate\Database\Eloquent\Builder;
 /**
  * A product that belongs to a user (its author).
  * Fillable lists the columns that may be mass assigned with Product::create([...]).
@@ -27,6 +29,15 @@ class Booking extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    /**
+     * Query scope: Booking::filter($filters) applies the filters sent in the URL.
+     */
+    public function scopeFilter(Builder $builder, QueryFilter $filters): Builder
+    {
+        return $filters->apply($builder);
+    }
+        
+   
 }
 
 
