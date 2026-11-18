@@ -40,7 +40,7 @@ class AuthorsController extends APIController
         if ($this->include('products')) {
             return new UserResource($author->load('products'));
         }
-        
+
         return new UserResource($author);
     }
 

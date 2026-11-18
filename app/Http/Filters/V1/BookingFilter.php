@@ -4,6 +4,17 @@ namespace App\Http\Filters\V1;
 
 class BookingFilter
 {
+
+    // The columns clients may sort bookings by
+    protected array $sortable = [
+        'name',
+        'status',
+        'slotTime' => 'slot_time',
+        'createdAt' => 'created_at',
+        'updatedAt' => 'updated_at',
+    ];
+
+
     /**
      * ?createdAt=2026-08-19           one day
      * ?createdAt=2026-08-01,2026-08-31 a date range (from,to)
