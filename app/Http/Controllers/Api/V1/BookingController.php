@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Booking;
 use App\Http\Resources\V1\BookingResource;
 use App\Http\Filters\V1\BookingFilter;
+use App\Http\Requests\Api\V1\StoreBookingRequest;
 
 class BookingController extends Controller
 {
@@ -31,11 +32,16 @@ class BookingController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * POST /api/v1/bookings
+     * Validates the body with StoreBookingRequest, then creates the booking.
+     * Laravel answers 201 Created automatically for a newly created resource.
      */
-    public function store(Request $request)
+    public function store(StoreBookingRequest $request)
     {
-        //
+        // mappedAttributes() converts the nested JSON into database columns
+        return new BookingResource(
+            Booking::create($request->mappedAttributes())
+        );
     }
 
     /**

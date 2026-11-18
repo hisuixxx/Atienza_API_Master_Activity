@@ -23,7 +23,7 @@ Route::middleware('auth:api')->group(function () {
     });
 
     // GET /bookings (list) and GET /bookings/{booking} (one booking)
-    Route::apiResource('bookings', BookingController::class)->only(['index', 'show']);
+    Route::apiResource('bookings', BookingController::class)->only(['index', 'show', 'store']);
 
     // Authors are read only: list and show
     Route::apiResource('authors', AuthorsController::class)->only(['index', 'show']);

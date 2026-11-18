@@ -4,9 +4,13 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Traits\APIResponse;
 
 class APIController extends Controller
 {
+    // Gives every controller that extends this class the ok(), success(), error() helpers.
+    use APIResponse;
+
     /**
      * Returns true when the client asked for a relationship with ?include=...
      * Example: /products?include=author -> include('author') is true.
