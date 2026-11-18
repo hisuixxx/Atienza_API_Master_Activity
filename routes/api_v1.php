@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\BookingController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\AuthorsController;
+use App\Http\Controllers\Api\V1\UserBookingsController;
 
 // Route::apiResource('bookings', BookingController::class)->only(['index']);
 
@@ -26,4 +27,10 @@ Route::middleware('auth:api')->group(function () {
 
     // Authors are read only: list and show
     Route::apiResource('authors', AuthorsController::class)->only(['index', 'show']);
+
+    // Authors are read only: list and show
+    Route::apiResource('authors', AuthorsController::class)->only(['index', 'show']);
+
+    // Bookings of one user: GET /users/{user}/bookings
+    Route::apiResource('users.bookings', UserBookingsController::class)->only(['index']);
 });
