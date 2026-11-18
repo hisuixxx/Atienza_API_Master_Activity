@@ -15,7 +15,11 @@ class BookingController extends Controller
      */
     public function index()
     {
-        //
+        // ?include=user: eager load the user in one extra query
+        if ($this->include('user')) {
+            return BookingResource::collection(Booking::with('user')->paginate());
+        }
+
         // return Booking::all();
         return BookingResource::collection(Booking::paginate());
     }
@@ -35,6 +39,11 @@ class BookingController extends Controller
      */
     public function show(Booking $booking)
     {
+        // ?include=user: load the user of this booking
+        if ($this->include('user')) {
+            return new BookingResource($booking->load('user'));
+        }
+        
         return new BookingResource($booking);
     }
 
