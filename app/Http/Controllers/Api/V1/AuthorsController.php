@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Http\Resources\V1\UserResource;
 
-class AuthorsController extends Controller
+class AuthorsController extends APIController
 {
     /**
      * GET /api/v1/authors
@@ -16,6 +15,11 @@ class AuthorsController extends Controller
     public function index()
     {
         //
+        // ?include=products: load each author's products in one extra query
+        if ($this->include('products')) {
+            return UserResource::collection(User::has('products')->with('products')->paginate());
+        }
+
         return UserResource::collection(User::has('bookings')->paginate());
     }
 
@@ -32,7 +36,11 @@ class AuthorsController extends Controller
      */
     public function show(User $author)
     {
-        //
+        // ?include=products: load this author's products
+        if ($this->include('products')) {
+            return new UserResource($author->load('products'));
+        }
+        
         return new UserResource($author);
     }
 
