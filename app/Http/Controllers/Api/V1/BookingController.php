@@ -63,17 +63,20 @@ class BookingController extends APIController
 
     /**
      * PATCH /api/v1/bookings/{booking}
-     * Updates only the fields that were sent (see UpdateBookingRequest).
-     */
+     * Updates only the fields that were sent, but only if the policy allows it.     */
     public function update(UpdateBookingRequest $request, Booking $booking)
     {
-        // mappedAttributes() returns only the keys present in the request
-        $booking->update($request->mappedAttributes());
+       // Ask BookingPolicy::update()
+        if ($this->isAble('update', $booking)) {
+            $booking->update($request->mappedAttributes());
 
-        return new BookingResource($booking);
+            return new BookingResource($booking);
+        }
+
+        return $this->notAuthorized('You are not authorized to update that resource.');
     }
 
-    /**
+    /**   
      * DELETE /api/v1/bookings/{booking}
      * Deletes the booking. A missing booking never reaches this method: Laravel answers 404.
      */
