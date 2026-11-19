@@ -13,10 +13,12 @@ use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Http\Filters\V1\QueryFilter;
 use Illuminate\Database\Eloquent\Builder;
+use App\Permissions\V1\Abilities;
 
 
-#[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password'])]
+// Inside class User:
+    #[Fillable(['name', 'email', 'password', 'is_manager'])]
+    #[Hidden(['password'])]
 class User extends Authenticatable implements JWTSubject
 
 {
@@ -28,11 +30,21 @@ class User extends Authenticatable implements JWTSubject
      *
      * @return array<string, string>
      */
+
+
+    
     protected function casts(): array
     {
         return [
+            'email_verified_at' => 'datetime',
             'password' => 'hashed',
+
+            // Returns true/false instead of 1/0
+            'is_manager' => 'boolean',
+            
+
         ];
+
     }
 
     /**
@@ -53,12 +65,14 @@ class User extends Authenticatable implements JWTSubject
     }
 
     /**
-     * Extra data stored in the token payload. Empty for now;
-     * Step 20 adds the user's abilities here.
+     * Extra data stored in the token payload: the user's abilities.
+     * They are written into the JWT every time the user logs in.
      */
     public function getJWTCustomClaims()
     {
-        return [];
+        return [
+            'abilities' => Abilities::getAbilities($this),
+        ];
     }
 
     /**
@@ -67,6 +81,22 @@ class User extends Authenticatable implements JWTSubject
     public function scopeFilter(Builder $builder, QueryFilter $filters): Builder
     {
         return $filters->apply($builder);
+    }
+
+    /**
+     * Checks an ability stored in the current JWT, for example 'booking:update'.
+     */
+    public function tokenCan(string $ability): bool
+    {
+        try {
+            // Read the "abilities" claim of the token sent with this request
+            $abilities = auth('api')->payload()->get('abilities') ?? [];
+        } catch (\Throwable $e) {
+            // No token, or an unreadable one: no abilities
+            return false;
+        }
+
+        return in_array($ability, $abilities, true);
     }
   
 }

@@ -30,5 +30,14 @@ class DatabaseSeeder extends Seeder
         Booking::factory(100)
             ->recycle($users)
             ->create();
+
+        // A manager account used to test the manager abilities
+        User::create([
+            'email' => 'manager@manager.com',
+            'password' => bcrypt('password'),
+            'name' => 'The Manager',
+            'is_manager' => true,
+        ]);
+    
     }
 }

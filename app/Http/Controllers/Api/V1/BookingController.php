@@ -35,15 +35,18 @@ class BookingController extends APIController
 
     /**
      * POST /api/v1/bookings
-     * Validates the body with StoreBookingRequest, then creates the booking.
-     * Laravel answers 201 Created automatically for a newly created resource.
+     * Creates a booking, but only if the policy allows this user to do so.
      */
     public function store(StoreBookingRequest $request)
     {
-        // mappedAttributes() converts the nested JSON into database columns
-        return new BookingResource(
-            Booking::create($request->mappedAttributes())
-        );
+       // Ask BookingPolicy::store() (checks the ability stored in the token)
+        if ($this->isAble('store', Booking::class)) {
+            return new BookingResource(
+                Booking::create($request->mappedAttributes())
+            );
+        }
+
+        return $this->notAuthorized('You are not authorized to create that resource.');
     }
 
     /**
@@ -78,24 +81,32 @@ class BookingController extends APIController
 
     /**   
      * DELETE /api/v1/bookings/{booking}
-     * Deletes the booking. A missing booking never reaches this method: Laravel answers 404.
+     *Deletes the booking, but only if the policy allows it.
      */
     public function destroy(Booking $booking)
     {
-        $booking->delete();
+      if ($this->isAble('delete', $booking)) {
+            $booking->delete();
 
-        return $this->ok('Booking successfully deleted');
-    }
+            return $this->ok('Booking successfully deleted');
+        }
+
+        return $this->notAuthorized('You are not authorized to delete that resource.');
+ }
 
 
     /**
      * PUT /api/v1/bookings/{booking}
-     * Replaces the whole booking: every field must be sent (see ReplaceBookingRequest).
+     * Replaces the whole booking, but only if the policy allows it.
      */
     public function replace(ReplaceBookingRequest $request, Booking $booking)
     {
-        $booking->update($request->mappedAttributes());
+        if ($this->isAble('replace', $booking)) {
+            $booking->update($request->mappedAttributes());
 
-        return new BookingResource($booking);
+            return new BookingResource($booking);
+        }
+
+        return $this->notAuthorized('You are not authorized to replace that resource.');
     }
 }
