@@ -9,6 +9,7 @@ use App\Http\Resources\V1\BookingResource;
 use App\Http\Filters\V1\BookingFilter;
 use App\Http\Requests\Api\V1\StoreBookingRequest;
 use App\Http\Requests\Api\V1\ReplaceBookingRequest;
+use App\Http\Requests\Api\V1\UpdateBookingRequest;
 
 class BookingController extends APIController
 {
@@ -61,11 +62,15 @@ class BookingController extends APIController
     }
 
     /**
-     * Update the specified resource in storage.
+     * PATCH /api/v1/bookings/{booking}
+     * Updates only the fields that were sent (see UpdateBookingRequest).
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateBookingRequest $request, Booking $booking)
     {
-        //
+        // mappedAttributes() returns only the keys present in the request
+        $booking->update($request->mappedAttributes());
+
+        return new BookingResource($booking);
     }
 
     /**

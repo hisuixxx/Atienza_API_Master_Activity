@@ -27,7 +27,10 @@ Route::middleware('auth:api')->group(function () {
 
     // PUT replaces the whole booking (custom method name: replace)
     Route::put('bookings/{booking}', [BookingController::class, 'replace']);
-    
+   
+    // PATCH updates only the fields that were sent
+    Route::patch('bookings/{booking}', [BookingController::class, 'update']);
+
     // Authors are read only: list and show
     Route::apiResource('authors', AuthorsController::class)->only(['index', 'show']);
 
