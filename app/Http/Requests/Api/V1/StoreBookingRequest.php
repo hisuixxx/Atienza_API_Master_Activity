@@ -4,7 +4,7 @@ namespace App\Http\Requests\Api\V1;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-namespace App\Http\Requests\Api\V1;
+use App\Permissions\V1\Abilities;
 
 class StoreBookingRequest extends BaseBookingRequest
 {
@@ -17,9 +17,7 @@ class StoreBookingRequest extends BaseBookingRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, ValidationRule|array<mixed>|string>
+     *Validation rules for creating a booking.
      */
     public function rules(): array
     {
@@ -30,7 +28,7 @@ class StoreBookingRequest extends BaseBookingRequest
             ? 'data.relationships.user.data.id'
             : 'user';
 
-        return [
+        $rules = [
             'data' => 'required|array',
             'data.attributes' => 'required|array',
             'data.attributes.name' => 'required|string',
@@ -40,6 +38,16 @@ class StoreBookingRequest extends BaseBookingRequest
             $userIdAttr => 'required|integer|exists:users,id',
         
         ];
+
+        // A user who may only create their own bookings must be the owner:
+        // size:5 means the id must equal 5, the logged-in user's id.
+        $user = $this->user();
+
+        if ($user->tokenCan(Abilities::CreateOwnBooking)) {
+            $rules[$userIdAttr] .= '|size:' . $user->id;
+        }
+
+        return $rules;
     
     
     }
