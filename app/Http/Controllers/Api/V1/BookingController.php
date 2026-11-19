@@ -8,8 +8,9 @@ use App\Models\Booking;
 use App\Http\Resources\V1\BookingResource;
 use App\Http\Filters\V1\BookingFilter;
 use App\Http\Requests\Api\V1\StoreBookingRequest;
+use App\Http\Requests\Api\V1\ReplaceBookingRequest;
 
-class BookingController extends Controller
+class BookingController extends APIController
 {
     /**
      *GET /api/v1/bookings
@@ -76,5 +77,17 @@ class BookingController extends Controller
         $booking->delete();
 
         return $this->ok('Booking successfully deleted');
+    }
+
+
+    /**
+     * PUT /api/v1/bookings/{booking}
+     * Replaces the whole booking: every field must be sent (see ReplaceBookingRequest).
+     */
+    public function replace(ReplaceBookingRequest $request, Booking $booking)
+    {
+        $booking->update($request->mappedAttributes());
+
+        return new BookingResource($booking);
     }
 }
