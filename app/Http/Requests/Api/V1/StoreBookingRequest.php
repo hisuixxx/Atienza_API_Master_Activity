@@ -28,6 +28,9 @@ class StoreBookingRequest extends BaseBookingRequest
             ? 'data.relationships.user.data.id'
             : 'user';
 
+        $user = $this->user();
+        $userRule = 'required|integer|exists:users,id';
+
         $rules = [
             'data' => 'required|array',
             'data.attributes' => 'required|array',
@@ -35,20 +38,17 @@ class StoreBookingRequest extends BaseBookingRequest
             'data.attributes.itemId' => 'required|string',
             'data.attributes.status' => 'required|string|in:pending,confirmed,cancelled',
             'data.attributes.slotTime' => 'required|string',
-            $userIdAttr => 'required|integer|exists:users,id',
+            // Default: the user must be the logged-in user
+            $userIdAttr => $userRule . '|size:' . $user->id,
         
         ];
 
-        // A user who may only create their own bookings must be the owner:
-        // size:5 means the id must equal 5, the logged-in user's id.
-        $user = $this->user();
-
-        if ($user->tokenCan(Abilities::CreateOwnBooking)) {
-            $rules[$userIdAttr] .= '|size:' . $user->id;
+        // Only the broad ability lifts the restriction (managers)
+        if ($user->tokenCan(Abilities::CreateBooking)) {
+            $rules[$userIdAttr] = $userRule;
         }
-
+       
         return $rules;
-    
     
     }
 

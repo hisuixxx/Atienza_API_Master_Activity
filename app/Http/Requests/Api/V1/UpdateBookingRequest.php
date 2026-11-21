@@ -17,8 +17,8 @@ class UpdateBookingRequest extends BaseBookingRequest
     }
 
     /**
-     * Validation rules for updating a product. "Sometimes" means:
-     * validate the field only when it was sent. 
+     * Validation rules for updating a product. 
+     * Validation rules for updating a booking (deny by default).    
      */
     public function rules(): array
     {
@@ -27,12 +27,13 @@ class UpdateBookingRequest extends BaseBookingRequest
             'data.attributes.itemId' => 'sometimes|string',
             'data.attributes.status' => 'sometimes|string|in:pending,confirmed,cancelled',
             'data.attributes.slotTime' => 'sometimes|string',
-            'data.relationships.user.data.id' => 'sometimes|integer|exists:users,id',
+            // Default: nobody may change the user
+        'data.relationships.user.data.id' => 'prohibited',
         ];
 
-        // Users who may only update their own bookings cannot change the owner
-        if ($this->user()->tokenCan(Abilities::UpdateOwnBooking)) {
-            $rules['data.relationships.user.data.id'] = 'prohibited';
+        // Only the broad ability lifts the restriction (managers)
+        if ($this->user()->tokenCan(Abilities::UpdateBooking)) {
+            $rules['data.relationships.user.data.id'] = 'sometimes|integer|exists:users,id';
         }
 
         return $rules;
