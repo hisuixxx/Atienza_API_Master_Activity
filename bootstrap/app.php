@@ -28,6 +28,13 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         //
+        $middleware->redirectGuestsTo(function (Request $request) {
+            if ($request->is('api/*') || $request->expectsJson()) {
+                return null;
+            }
+
+            return null;
+        });
     })
     ->withExceptions(function (Exceptions $exceptions) {
        // Always answer with JSON (never an HTML page) for URLs that start with api/

@@ -21,6 +21,8 @@ class UserResource extends JsonResource
             'attributes' => [
                 'name' => $this->name,
                 'email' => $this->email,
+                // true for managers, false for everyone else
+                'isManager' => $this->is_manager,
                 // These fields appear only on the authors and users endpoints
                 $this->mergeWhen($request->routeIs(['authors.*', 'users.*']), [
                     'emailVerifiedAt' => $this->email_verified_at,

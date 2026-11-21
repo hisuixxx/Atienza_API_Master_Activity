@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\BookingController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\AuthorsController;
 use App\Http\Controllers\Api\V1\UserBookingsController;
+use App\Http\Controllers\Api\V1\UserController;
 
 // Route::apiResource('bookings', BookingController::class)->only(['index']);
 
@@ -34,14 +35,17 @@ Route::middleware('auth:api')->group(function () {
     // Authors are read only: list and show
     Route::apiResource('authors', AuthorsController::class)->only(['index', 'show']);
 
-    // Authors are read only: list and show
-    Route::apiResource('authors', AuthorsController::class)->only(['index', 'show']);
+    // Users (management): list, create, show and delete use the resource routes
+    Route::apiResource('users', UserController::class)->except(['update']);
+    Route::put('users/{user}', [UserController::class, 'replace']);
+    Route::patch('users/{user}', [UserController::class, 'update']);      
 
     // Bookings of one user: /users/{user}/bookings
     Route::apiResource('users.bookings', UserBookingsController::class)
         ->only(['index', 'store', 'destroy'])
         ->scoped(); // the booking must belong to the user in the URL (otherwise 404)
         
+
     // PUT and PATCH use our own method names, so they are registered by hand
     Route::put('users/{user}/bookings/{booking}', [UserBookingsController::class, 'replace'])
         ->scopeBindings();
